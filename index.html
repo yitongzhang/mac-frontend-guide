@@ -1,0 +1,2642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mac Frontend Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'SF Mono', 'monospace'],
+                    },
+                    colors: {
+                        accent: '#007AFF',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        /* Code blocks */
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+        }
+        .code-block code {
+            color: #d4d4d4;
+            font-size: 0.875rem;
+            line-height: 1.7;
+            white-space: pre;
+            display: block;
+        }
+        .code-block .keyword { color: #c586c0; }
+        .code-block .type { color: #4ec9b0; }
+        .code-block .string { color: #ce9178; }
+        .code-block .property { color: #9cdcfe; }
+        .code-block .comment { color: #6a9955; }
+        .code-block .function { color: #dcdcaa; }
+
+        /* Section styling */
+        .section {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+        }
+        .section:first-of-type {
+            border-top: none;
+        }
+
+        /* Visual diagrams */
+        .diagram-box {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: #fafafa;
+        }
+
+        /* Interactive demos */
+        .demo-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Stack visualizations */
+        .stack-item {
+            transition: all 0.3s ease;
+        }
+
+        /* Comparison tables */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .comparison-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 600;
+        }
+        .comparison-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased">
+    <div class="max-w-5xl mx-auto px-6 py-16">
+
+        <!-- 00 - Introduction -->
+        <section class="section" id="s00">
+            <div class="text-sm text-gray-400 font-mono mb-2">00</div>
+            <h1 class="text-3xl font-bold text-accent mb-4">Mac Frontend Guide</h1>
+            <p class="text-gray-600 text-lg leading-relaxed">
+                A guide to native Mac app frontend for designers who know React, Tailwind, and Next.js.
+            </p>
+        </section>
+
+        <!-- 01 - The Mac Tech Stack -->
+        <section class="section" id="s01">
+            <div class="text-sm text-gray-400 font-mono mb-2">01</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">The Mac Tech Stack</h2>
+            <p class="text-gray-600 mb-6">Here's how the layers map to what you already know.</p>
+
+            <div class="diagram-box p-6 font-mono text-sm">
+                <div class="space-y-0">
+                    <div class="bg-white border border-gray-200 rounded-t-lg p-4 text-center">
+                        <span class="font-semibold">Your App Code</span>
+                    </div>
+                    <div class="bg-blue-50 border-x border-gray-200 p-4 flex justify-between items-center">
+                        <span class="font-semibold text-blue-700">SwiftUI</span>
+                        <span class="text-gray-400 text-xs">declarative UI framework</span>
+                        <span class="text-blue-600 text-xs font-medium">Like React</span>
+                    </div>
+                    <div class="bg-purple-50 border-x border-gray-200 p-4 flex justify-between items-center">
+                        <span class="font-semibold text-purple-700">Swift</span>
+                        <span class="text-gray-400 text-xs">language</span>
+                        <span class="text-purple-600 text-xs font-medium">Like TypeScript</span>
+                    </div>
+                    <div class="bg-orange-50 border-x border-gray-200 p-4 flex justify-between items-center">
+                        <span class="font-semibold text-orange-700">Cocoa / AppKit</span>
+                        <span class="text-gray-400 text-xs">system APIs</span>
+                        <span class="text-orange-600 text-xs font-medium">Like Browser APIs</span>
+                    </div>
+                    <div class="bg-gray-100 border border-gray-200 rounded-b-lg p-4 text-center">
+                        <span class="font-semibold text-gray-600">macOS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 02 - What is Cocoa? -->
+        <section class="section" id="s02">
+            <div class="text-sm text-gray-400 font-mono mb-2">02</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">What is Cocoa?</h2>
+            <p class="text-gray-600 mb-6">
+                Cocoa is Apple's collection of frameworks for macOS. Think of it like how "the web platform" includes DOM, Fetch API, Web Storage, etc.
+            </p>
+
+            <div class="diagram-box p-6">
+                <div class="text-center mb-4 font-semibold text-gray-700">Cocoa</div>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm">
+                        <span class="font-medium">AppKit</span>
+                        <span class="text-gray-400 text-xs block">UI components</span>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm">
+                        <span class="font-medium">Foundation</span>
+                        <span class="text-gray-400 text-xs block">data & utilities</span>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm">
+                        <span class="font-medium">Core Data</span>
+                        <span class="text-gray-400 text-xs block">persistence</span>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm">
+                        <span class="font-medium">Core Graphics</span>
+                        <span class="text-gray-400 text-xs block">drawing</span>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm">
+                        <span class="font-medium">Core Animation</span>
+                        <span class="text-gray-400 text-xs block">animation</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03 - Objective-C vs Swift -->
+        <section class="section" id="s03">
+            <div class="text-sm text-gray-400 font-mono mb-2">03</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Objective-C vs Swift</h2>
+            <p class="text-gray-600 mb-6">
+                Objective-C is the legacy (1980s). Swift is what you'll use today. Think jQuery-era JS vs modern TypeScript.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">Objective-C (legacy)</div>
+                    <div class="code-block">
+                        <code>
+<span class="comment">// Creating a button</span>
+NSButton *button = [[NSButton alloc]
+    initWithFrame:NSMakeRect(0, 0, 100, 30)];
+[button setTitle:@"Click me"];
+[button setTarget:self];
+[button setAction:@selector(handleClick:)];
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">Swift (modern)</div>
+                    <div class="code-block">
+                        <code>
+<span class="comment">// Creating a button</span>
+<span class="type">Button</span>(<span class="string">"Click me"</span>) {
+    <span class="function">handleClick</span>()
+}
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 04 - AppKit vs SwiftUI -->
+        <section class="section" id="s04">
+            <div class="text-sm text-gray-400 font-mono mb-2">04</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">AppKit vs SwiftUI</h2>
+            <p class="text-gray-600 mb-6">
+                AppKit is imperative (like vanilla DOM manipulation). SwiftUI is declarative (like React). SwiftUI is mature enough for most apps in 2025.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">AppKit (imperative)</div>
+                    <div class="code-block">
+                        <code>
+<span class="comment">// Manual state management</span>
+<span class="keyword">func</span> <span class="function">updateLabel</span>() {
+    label.stringValue = <span class="string">"Count: \(count)"</span>
+}
+
+<span class="keyword">func</span> <span class="function">increment</span>() {
+    count += <span class="string">1</span>
+    <span class="function">updateLabel</span>()
+}
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI (declarative)</div>
+                    <div class="code-block">
+                        <code>
+<span class="comment">// Automatic UI updates</span>
+<span class="keyword">@State</span> <span class="keyword">var</span> count = <span class="string">0</span>
+
+<span class="type">Text</span>(<span class="string">"Count: \(count)"</span>)
+<span class="type">Button</span>(<span class="string">"+"</span>) { count += <span class="string">1</span> }
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 05 - React is Unopinionated. SwiftUI is Not. -->
+        <section class="section" id="s05">
+            <div class="text-sm text-gray-400 font-mono mb-2">05</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">React is Unopinionated. SwiftUI is Not.</h2>
+            <p class="text-gray-600 mb-6">
+                React gives you a blank canvas. SwiftUI gives you a design system.
+            </p>
+
+            <div class="overflow-x-auto mb-8">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>React</th>
+                            <th>SwiftUI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-medium">Default button</td>
+                            <td class="text-gray-500">None (you style it)</td>
+                            <td class="text-gray-500">System button with HIG styling</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium">Forms</td>
+                            <td class="text-gray-500">Build from scratch</td>
+                            <td class="text-gray-500">Form container with auto-layout</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium">Dark mode</td>
+                            <td class="text-gray-500">You implement it</td>
+                            <td class="text-gray-500">Automatic</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium">Accessibility</td>
+                            <td class="text-gray-500">You implement it</td>
+                            <td class="text-gray-500">Built-in</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium">Platform feel</td>
+                            <td class="text-gray-500">You design it</td>
+                            <td class="text-gray-500">Native by default</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Visual comparison: React vs SwiftUI form -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">React (blank canvas)</div>
+                    <div class="demo-container p-6 bg-white min-h-[200px]">
+                        <div class="space-y-4">
+                            <input type="text" placeholder="Username" class="w-full border-0 bg-transparent text-gray-900 outline-none">
+                            <input type="password" placeholder="Password" class="w-full border-0 bg-transparent text-gray-900 outline-none">
+                            <button class="text-gray-900">Submit</button>
+                        </div>
+                        <div class="mt-4 text-xs text-gray-400 italic">No styling by default</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI (styled automatically)</div>
+                    <div class="demo-container p-4 bg-gray-50 min-h-[200px]">
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <div class="border-b border-gray-100 px-4 py-3 flex items-center">
+                                <span class="text-gray-500 text-sm w-24">Username</span>
+                                <input type="text" class="flex-1 border-0 bg-transparent text-gray-900 outline-none text-sm">
+                            </div>
+                            <div class="px-4 py-3 flex items-center">
+                                <span class="text-gray-500 text-sm w-24">Password</span>
+                                <input type="password" class="flex-1 border-0 bg-transparent text-gray-900 outline-none text-sm">
+                            </div>
+                        </div>
+                        <button class="mt-4 w-full bg-blue-500 text-white rounded-lg py-2 text-sm font-medium">Submit</button>
+                        <div class="mt-2 text-xs text-gray-400 italic">Form auto-styled by system</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 06 - Where Apple Enforces Conventions -->
+        <section class="section" id="s06">
+            <div class="text-sm text-gray-400 font-mono mb-2">06</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Where Apple Enforces Conventions</h2>
+            <p class="text-gray-600 mb-6">
+                Things you get "for free" (whether you want them or not).
+            </p>
+
+            <!-- Annotated Mac window -->
+            <div class="diagram-box p-6 relative">
+                <!-- Window mockup -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+                    <!-- Title bar -->
+                    <div class="bg-gray-100 px-4 py-2 flex items-center border-b border-gray-200 relative">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                        </div>
+                        <div class="flex-1 text-center text-sm text-gray-600 font-medium">My App</div>
+                        <!-- Annotation -->
+                        <div class="absolute -right-2 top-1/2 transform translate-x-full -translate-y-1/2">
+                            <div class="flex items-center">
+                                <div class="w-8 h-px bg-orange-400"></div>
+                                <div class="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded ml-2 whitespace-nowrap">
+                                    Window chrome (system-controlled)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Toolbar -->
+                    <div class="bg-gray-50 px-4 py-2 flex items-center border-b border-gray-200 relative">
+                        <div class="flex space-x-3">
+                            <div class="text-gray-400 text-sm">Back</div>
+                            <div class="text-gray-400 text-sm">Forward</div>
+                        </div>
+                        <div class="flex-1"></div>
+                        <div class="text-gray-400 text-sm">Search</div>
+                    </div>
+                    <!-- Content -->
+                    <div class="p-6 min-h-[150px] relative">
+                        <div class="text-gray-800 font-medium mb-4">Settings</div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Dark Mode</span>
+                                <div class="w-10 h-6 bg-blue-500 rounded-full relative">
+                                    <div class="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Notifications</span>
+                                <div class="w-10 h-6 bg-gray-300 rounded-full relative">
+                                    <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Annotation -->
+                        <div class="absolute -right-2 top-8 transform translate-x-full">
+                            <div class="flex items-center">
+                                <div class="w-8 h-px bg-blue-400"></div>
+                                <div class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded ml-2 whitespace-nowrap">
+                                    System controls (default style)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-4 text-sm">
+                <div class="space-y-2">
+                    <div class="flex items-start">
+                        <span class="text-orange-500 mr-2">1.</span>
+                        <div><span class="font-medium">Menu Bar</span> &mdash; every Mac app has one</div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-orange-500 mr-2">2.</span>
+                        <div><span class="font-medium">Window Chrome</span> &mdash; title bar, traffic lights</div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-orange-500 mr-2">3.</span>
+                        <div><span class="font-medium">System Controls</span> &mdash; buttons, toggles, pickers</div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-start">
+                        <span class="text-orange-500 mr-2">4.</span>
+                        <div><span class="font-medium">Form Layout</span> &mdash; enforced spacing & alignment</div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-orange-500 mr-2">5.</span>
+                        <div><span class="font-medium">Typography</span> &mdash; SF Pro with dynamic sizing</div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-orange-500 mr-2">6.</span>
+                        <div><span class="font-medium">Colors</span> &mdash; semantic colors that adapt</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 07 - The Customization Spectrum -->
+        <section class="section" id="s07">
+            <div class="text-sm text-gray-400 font-mono mb-2">07</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">The Customization Spectrum</h2>
+            <p class="text-gray-600 mb-6">
+                Four levels of control. Pick the right one for your needs.
+            </p>
+
+            <!-- Spectrum diagram -->
+            <div class="diagram-box p-6 mb-6">
+                <div class="flex items-center justify-between mb-4 text-xs text-gray-400">
+                    <span>More Native</span>
+                    <div class="flex-1 mx-4 h-px bg-gradient-to-r from-green-300 via-yellow-300 to-red-300"></div>
+                    <span>More Custom</span>
+                </div>
+                <div class="grid grid-cols-4 gap-3">
+                    <div class="text-center">
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-2">
+                            <div class="text-2xl mb-2">
+                                <button class="bg-blue-500 text-white text-xs px-3 py-1.5 rounded">Button</button>
+                            </div>
+                            <div class="text-xs font-mono text-gray-500">Button()</div>
+                        </div>
+                        <div class="text-xs text-gray-600 font-medium">Default</div>
+                        <div class="text-xs text-gray-400">Auto-updates with OS</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-2">
+                            <div class="text-2xl mb-2">
+                                <button class="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-full">Button</button>
+                            </div>
+                            <div class="text-xs font-mono text-gray-500">.buttonStyle()</div>
+                        </div>
+                        <div class="text-xs text-gray-600 font-medium">Styled</div>
+                        <div class="text-xs text-gray-400">Keep behavior</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-2">
+                            <div class="text-2xl mb-2">
+                                <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1.5 rounded-lg inline-block">Button</div>
+                            </div>
+                            <div class="text-xs font-mono text-gray-500">Custom View</div>
+                        </div>
+                        <div class="text-xs text-gray-600 font-medium">Composed</div>
+                        <div class="text-xs text-gray-400">Full control</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-2">
+                            <div class="text-2xl mb-2">
+                                <svg width="48" height="24" viewBox="0 0 48 24" class="mx-auto">
+                                    <polygon points="24,0 48,24 0,24" fill="#8b5cf6"/>
+                                </svg>
+                            </div>
+                            <div class="text-xs font-mono text-gray-500">Path { }</div>
+                        </div>
+                        <div class="text-xs text-gray-600 font-medium">Canvas/Path</div>
+                        <div class="text-xs text-gray-400">Pixel-level</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 08 - Styling System Controls -->
+        <section class="section" id="s08">
+            <div class="text-sm text-gray-400 font-mono mb-2">08</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Styling System Controls</h2>
+            <p class="text-gray-600 mb-6">
+                Keep the behavior, customize the appearance. Use .buttonStyle(), .toggleStyle(), etc.
+            </p>
+
+            <div class="code-block mb-6">
+                <code>
+<span class="comment">// Built-in styles</span>
+<span class="type">Button</span>(<span class="string">"Save"</span>) { <span class="function">save</span>() }
+    .<span class="function">buttonStyle</span>(.<span class="property">borderedProminent</span>)
+
+<span class="comment">// Custom style</span>
+<span class="keyword">struct</span> <span class="type">MyButtonStyle</span>: <span class="type">ButtonStyle</span> {
+    <span class="keyword">func</span> <span class="function">makeBody</span>(configuration: <span class="type">Configuration</span>) -> <span class="keyword">some</span> <span class="type">View</span> {
+        configuration.label
+            .<span class="function">padding</span>()
+            .<span class="function">background</span>(<span class="type">Color</span>.<span class="property">blue</span>)
+            .<span class="function">foregroundColor</span>(.<span class="property">white</span>)
+            .<span class="function">cornerRadius</span>(<span class="string">8</span>)
+    }
+}
+                </code>
+            </div>
+
+            <!-- Button style gallery -->
+            <div class="diagram-box p-6">
+                <div class="text-sm text-gray-500 mb-4">Button style progression:</div>
+                <div class="flex items-center justify-around">
+                    <div class="text-center">
+                        <button class="text-blue-500 text-sm">Save</button>
+                        <div class="text-xs text-gray-400 mt-2">.plain</div>
+                    </div>
+                    <div class="text-gray-300">&rarr;</div>
+                    <div class="text-center">
+                        <button class="border border-gray-300 text-gray-700 text-sm px-4 py-1 rounded">Save</button>
+                        <div class="text-xs text-gray-400 mt-2">.bordered</div>
+                    </div>
+                    <div class="text-gray-300">&rarr;</div>
+                    <div class="text-center">
+                        <button class="bg-blue-500 text-white text-sm px-4 py-1 rounded">Save</button>
+                        <div class="text-xs text-gray-400 mt-2">.borderedProminent</div>
+                    </div>
+                    <div class="text-gray-300">&rarr;</div>
+                    <div class="text-center">
+                        <button class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm px-4 py-2 rounded-full shadow-lg">Save</button>
+                        <div class="text-xs text-gray-400 mt-2">Custom</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 09 - Going Fully Custom: Shape & Path -->
+        <section class="section" id="s09">
+            <div class="text-sm text-gray-400 font-mono mb-2">09</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Going Fully Custom: Shape & Path</h2>
+            <p class="text-gray-600 mb-6">
+                When you need pixel-level control. Like SVG paths in the browser.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="code-block">
+                    <code>
+<span class="comment">// Custom shape (like SVG)</span>
+<span class="keyword">struct</span> <span class="type">Hexagon</span>: <span class="type">Shape</span> {
+    <span class="keyword">func</span> <span class="function">path</span>(in rect: <span class="type">CGRect</span>) -> <span class="type">Path</span> {
+        <span class="type">Path</span> { path <span class="keyword">in</span>
+            <span class="keyword">let</span> center = <span class="type">CGPoint</span>(
+                x: rect.midX,
+                y: rect.midY
+            )
+            <span class="comment">// Draw hexagon points...</span>
+            path.<span class="function">move</span>(to: ...)
+            path.<span class="function">addLine</span>(to: ...)
+        }
+    }
+}
+
+<span class="comment">// Use it like any view</span>
+<span class="type">Hexagon</span>()
+    .<span class="function">fill</span>(.<span class="property">blue</span>)
+    .<span class="function">frame</span>(width: <span class="string">100</span>, height: <span class="string">100</span>)
+                    </code>
+                </div>
+                <div class="diagram-box flex items-center justify-center">
+                    <!-- Hexagon visualization -->
+                    <div class="relative">
+                        <svg width="120" height="104" viewBox="0 0 120 104">
+                            <polygon
+                                points="60,0 120,26 120,78 60,104 0,78 0,26"
+                                fill="#3b82f6"
+                                stroke="#2563eb"
+                                stroke-width="2"
+                            />
+                        </svg>
+                        <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-400">
+                            move(to:)
+                        </div>
+                        <div class="absolute top-4 -right-16 text-xs text-gray-400">
+                            addLine(to:)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10 - Canvas: Your HTML Canvas Equivalent -->
+        <section class="section" id="s10">
+            <div class="text-sm text-gray-400 font-mono mb-2">10</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Canvas: Your HTML Canvas Equivalent</h2>
+            <p class="text-gray-600 mb-6">
+                Immediate mode drawing for complex, animated graphics. Just like &lt;canvas&gt; in the browser.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="code-block">
+                    <code>
+<span class="type">Canvas</span> { context, size <span class="keyword">in</span>
+    <span class="comment">// Draw anything procedurally</span>
+    context.<span class="function">fill</span>(
+        <span class="type">Path</span>(ellipseIn: <span class="type">CGRect</span>(
+            x: <span class="string">20</span>, y: <span class="string">20</span>,
+            width: <span class="string">60</span>, height: <span class="string">60</span>
+        )),
+        with: .<span class="function">color</span>(.<span class="property">red</span>)
+    )
+
+    context.<span class="function">stroke</span>(
+        <span class="type">Path</span> { p <span class="keyword">in</span>
+            p.<span class="function">move</span>(to: ...)
+            p.<span class="function">addLine</span>(to: ...)
+        },
+        with: .<span class="function">color</span>(.<span class="property">blue</span>)
+    )
+}
+                    </code>
+                </div>
+                <div class="diagram-box flex items-center justify-center bg-gray-900 rounded-lg">
+                    <!-- Canvas visualization -->
+                    <svg width="160" height="120" viewBox="0 0 160 120">
+                        <ellipse cx="50" cy="50" rx="30" ry="30" fill="#ef4444"/>
+                        <ellipse cx="90" cy="60" rx="25" ry="25" fill="#3b82f6" opacity="0.8"/>
+                        <ellipse cx="70" cy="80" rx="35" ry="20" fill="#22c55e" opacity="0.6"/>
+                        <line x1="20" y1="100" x2="140" y2="100" stroke="#fbbf24" stroke-width="2"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11 - SwiftUI is Your New React -->
+        <section class="section" id="s11">
+            <div class="text-sm text-gray-400 font-mono mb-2">11</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">SwiftUI is Your New React</h2>
+            <p class="text-gray-600 mb-6">
+                The concepts map almost 1:1. Here's your translation guide.
+            </p>
+
+            <div class="overflow-x-auto">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>React</th>
+                            <th>SwiftUI</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-sm">Component</td>
+                            <td class="font-mono text-sm">View</td>
+                            <td class="text-gray-500 text-sm">struct instead of function</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">JSX</td>
+                            <td class="font-mono text-sm">Swift DSL</td>
+                            <td class="text-gray-500 text-sm">No angle brackets needed</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">props</td>
+                            <td class="font-mono text-sm">Parameters</td>
+                            <td class="text-gray-500 text-sm">Passed to struct init</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">useState</td>
+                            <td class="font-mono text-sm">@State</td>
+                            <td class="text-gray-500 text-sm">Property wrapper</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">useContext</td>
+                            <td class="font-mono text-sm">@Environment</td>
+                            <td class="text-gray-500 text-sm">Injected by parent views</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">children</td>
+                            <td class="font-mono text-sm">@ViewBuilder</td>
+                            <td class="text-gray-500 text-sm">Closure that returns views</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 12 - Your First View -->
+        <section class="section" id="s12">
+            <div class="text-sm text-gray-400 font-mono mb-2">12</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Your First View</h2>
+            <p class="text-gray-600 mb-6">
+                A minimal SwiftUI view. It's just a struct that conforms to the View protocol.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="code-block">
+                    <code>
+<span class="keyword">struct</span> <span class="type">HelloWorld</span>: <span class="type">View</span> {
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">Text</span>(<span class="string">"Hello, World!"</span>)
+    }
+}
+                    </code>
+                </div>
+                <div class="demo-container p-6 flex items-center justify-center bg-gray-50">
+                    <span class="text-gray-900">Hello, World!</span>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">React equivalent</div>
+                    <div class="code-block">
+                        <code>
+<span class="keyword">function</span> <span class="function">HelloWorld</span>() {
+    <span class="keyword">return</span> <span class="string">&lt;p&gt;</span>Hello, World!<span class="string">&lt;/p&gt;</span>
+}
+                        </code>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-500 flex items-center">
+                    <div>
+                        <p class="mb-2"><span class="font-medium">struct</span> = a value type (not a class)</p>
+                        <p class="mb-2"><span class="font-medium">View</span> = the protocol all UI conforms to</p>
+                        <p><span class="font-medium">body</span> = computed property returning the UI</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 13 - Building Blocks (Not Just Divs) -->
+        <section class="section" id="s13">
+            <div class="text-sm text-gray-400 font-mono mb-2">13</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Building Blocks (Not Just Divs)</h2>
+            <p class="text-gray-600 mb-6">
+                In React, everything is a &lt;div&gt; you style from scratch. SwiftUI gives you higher-level primitives. Some are neutral canvases, others come with opinions.
+            </p>
+
+            <!-- The spectrum diagram -->
+            <div class="diagram-box p-6 mb-6">
+                <div class="flex items-center justify-between mb-4 text-xs text-gray-400">
+                    <span>Neutral (you style everything)</span>
+                    <div class="flex-1 mx-4 h-px bg-gradient-to-r from-green-300 via-yellow-300 to-orange-300"></div>
+                    <span>Opinionated (comes with defaults)</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="font-medium text-green-700 mb-2">Primitives</div>
+                            <div class="text-xs text-gray-500 space-y-1">
+                                <div>Text</div>
+                                <div>Image</div>
+                                <div>Shape</div>
+                                <div>Color</div>
+                                <div>Spacer</div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2">Blank canvas</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <div class="font-medium text-yellow-700 mb-2">Controls</div>
+                            <div class="text-xs text-gray-500 space-y-1">
+                                <div>Button</div>
+                                <div>TextField</div>
+                                <div>Toggle</div>
+                                <div>Slider</div>
+                                <div>Picker</div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2">Behavior + styling</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <div class="font-medium text-orange-700 mb-2">Containers</div>
+                            <div class="text-xs text-gray-500 space-y-1">
+                                <div>List</div>
+                                <div>Form</div>
+                                <div>NavigationStack</div>
+                                <div>TabView</div>
+                                <div>Sheet</div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2">Layout + behavior + styling</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">React</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Everything is a div you style</span>
+&lt;<span class="property">div</span> className="text-lg"&gt;Text&lt;/<span class="property">div</span>&gt;
+&lt;<span class="property">div</span> className="w-10 h-10"&gt;
+    &lt;<span class="property">img</span> src="..." /&gt;
+&lt;/<span class="property">div</span>&gt;
+&lt;<span class="property">div</span> className="w-20 h-20 bg-blue-500
+    rounded-full"&gt;&lt;/<span class="property">div</span>&gt;
+&lt;<span class="property">button</span> className="..."&gt;Click&lt;/<span class="property">button</span>&gt;
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Purpose-built types</span>
+<span class="type">Text</span>(<span class="string">"Text"</span>)
+    .<span class="function">font</span>(.<span class="property">title3</span>)
+<span class="type">Image</span>(<span class="string">"photo"</span>)
+    .<span class="function">frame</span>(width: <span class="string">40</span>, height: <span class="string">40</span>)
+<span class="type">Circle</span>()
+    .<span class="function">fill</span>(.<span class="property">blue</span>)
+    .<span class="function">frame</span>(width: <span class="string">80</span>, height: <span class="string">80</span>)
+<span class="type">Button</span>(<span class="string">"Click"</span>) { }
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 14 - Primitives: Your Blank Canvas -->
+        <section class="section" id="s14">
+            <div class="text-sm text-gray-400 font-mono mb-2">18</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Primitives: Your Blank Canvas</h2>
+            <p class="text-gray-600 mb-6">
+                These are neutral building blocks. They have minimal opinions &mdash; you control the styling.
+            </p>
+
+            <!-- Text -->
+            <div class="mb-8">
+                <div class="flex items-center mb-3">
+                    <div class="bg-green-100 text-green-700 text-xs font-mono px-2 py-1 rounded mr-3">Text</div>
+                    <span class="text-sm text-gray-500">Like &lt;span&gt; but smarter</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="code-block text-xs">
+                        <code>
+<span class="type">Text</span>(<span class="string">"Hello"</span>)
+    .<span class="function">font</span>(.<span class="property">largeTitle</span>)
+    .<span class="function">fontWeight</span>(.<span class="property">bold</span>)
+    .<span class="function">foregroundColor</span>(.<span class="property">blue</span>)
+    .<span class="function">italic</span>()
+                        </code>
+                    </div>
+                    <div class="diagram-box p-4">
+                        <div class="text-sm text-gray-500 mb-2">What you get for free:</div>
+                        <ul class="text-xs text-gray-600 space-y-1">
+                            <li>• System font (SF Pro)</li>
+                            <li>• Dynamic Type (accessibility sizing)</li>
+                            <li>• Localization support</li>
+                            <li>• Automatic truncation</li>
+                        </ul>
+                        <div class="text-sm text-gray-500 mt-3 mb-1">What you control:</div>
+                        <ul class="text-xs text-gray-600 space-y-1">
+                            <li>• Font, size, weight, color</li>
+                            <li>• Alignment, line spacing, kerning</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="mb-8">
+                <div class="flex items-center mb-3">
+                    <div class="bg-green-100 text-green-700 text-xs font-mono px-2 py-1 rounded mr-3">Image</div>
+                    <span class="text-sm text-gray-500">Like &lt;img&gt; + built-in icon library</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Your images</span>
+<span class="type">Image</span>(<span class="string">"my-photo"</span>)
+    .<span class="function">resizable</span>()
+    .<span class="function">scaledToFit</span>()
+
+<span class="comment">// SF Symbols (5000+ icons!)</span>
+<span class="type">Image</span>(systemName: <span class="string">"heart.fill"</span>)
+    .<span class="function">foregroundColor</span>(.<span class="property">red</span>)
+    .<span class="function">font</span>(.<span class="property">title</span>)
+                        </code>
+                    </div>
+                    <div class="diagram-box p-4">
+                        <div class="text-sm text-gray-500 mb-2">SF Symbols = free icon library</div>
+                        <div class="flex flex-wrap gap-3 text-2xl text-gray-600 mb-3">
+                            <span>♥</span><span>★</span><span>⚙</span><span>🔍</span><span>📁</span><span>✓</span>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            Search at <a href="https://developer.apple.com/sf-symbols/" class="text-blue-500 underline">developer.apple.com/sf-symbols</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shapes -->
+            <div class="mb-8">
+                <div class="flex items-center mb-3">
+                    <div class="bg-green-100 text-green-700 text-xs font-mono px-2 py-1 rounded mr-3">Shapes</div>
+                    <span class="text-sm text-gray-500">Pure geometry, zero styling defaults</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Built-in shapes</span>
+<span class="type">Rectangle</span>()
+<span class="type">RoundedRectangle</span>(cornerRadius: <span class="string">12</span>)
+<span class="type">Circle</span>()
+<span class="type">Ellipse</span>()
+<span class="type">Capsule</span>()
+
+<span class="comment">// Style them yourself</span>
+<span class="type">Circle</span>()
+    .<span class="function">fill</span>(.<span class="property">blue</span>)
+    .<span class="function">stroke</span>(.<span class="property">black</span>, lineWidth: <span class="string">2</span>)
+    .<span class="function">frame</span>(width: <span class="string">100</span>, height: <span class="string">100</span>)
+                        </code>
+                    </div>
+                    <div class="diagram-box p-4 flex items-center justify-around">
+                        <div class="w-12 h-12 bg-blue-500"></div>
+                        <div class="w-12 h-12 bg-purple-500 rounded-lg"></div>
+                        <div class="w-12 h-12 bg-green-500 rounded-full"></div>
+                        <div class="w-16 h-8 bg-orange-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color & Spacer -->
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <div class="flex items-center mb-3">
+                        <div class="bg-green-100 text-green-700 text-xs font-mono px-2 py-1 rounded mr-3">Color</div>
+                        <span class="text-sm text-gray-500">Can BE a view</span>
+                    </div>
+                    <div class="code-block text-xs mb-2">
+                        <code>
+<span class="comment">// Color IS a view (fills space)</span>
+<span class="type">Color</span>.<span class="property">blue</span>
+    .<span class="function">frame</span>(height: <span class="string">100</span>)
+
+<span class="comment">// Semantic colors (auto dark mode)</span>
+<span class="type">Color</span>.<span class="property">primary</span>
+<span class="type">Color</span>.<span class="property">secondary</span>
+<span class="type">Color</span>(.<span class="property">systemBackground</span>)
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center mb-3">
+                        <div class="bg-green-100 text-green-700 text-xs font-mono px-2 py-1 rounded mr-3">Spacer</div>
+                        <span class="text-sm text-gray-500">Invisible, flexible space</span>
+                    </div>
+                    <div class="code-block text-xs mb-2">
+                        <code>
+<span class="type">HStack</span> {
+    <span class="type">Text</span>(<span class="string">"Left"</span>)
+    <span class="type">Spacer</span>()  <span class="comment">// Pushes apart</span>
+    <span class="type">Text</span>(<span class="string">"Right"</span>)
+}
+
+<span class="type">Spacer</span>()
+    .<span class="function">frame</span>(height: <span class="string">20</span>)  <span class="comment">// Fixed size</span>
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 diagram-box p-4 bg-green-50 border-green-200">
+                <div class="flex items-start">
+                    <span class="text-green-600 mr-2">✓</span>
+                    <div class="text-sm text-green-800">
+                        <span class="font-medium">Primitives = full creative control.</span> Use these when building custom UI. They're your blank canvas.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 15 - Controls: Behavior + Defaults -->
+        <section class="section" id="s15">
+            <div class="text-sm text-gray-400 font-mono mb-2">15</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Controls: Behavior + Defaults</h2>
+            <p class="text-gray-600 mb-6">
+                These come with built-in behavior AND default styling. Great for native feel, but you'll need to customize or avoid them for fully custom UI.
+            </p>
+
+            <!-- Button -->
+            <div class="mb-8">
+                <div class="flex items-center mb-3">
+                    <div class="bg-yellow-100 text-yellow-700 text-xs font-mono px-2 py-1 rounded mr-3">Button</div>
+                    <span class="text-sm text-gray-500">Tap handling + accessibility + default style</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Default: plain blue text</span>
+<span class="type">Button</span>(<span class="string">"Tap me"</span>) {
+    <span class="function">doSomething</span>()
+}
+
+<span class="comment">// Restyle with ButtonStyle</span>
+<span class="type">Button</span>(<span class="string">"Styled"</span>) { }
+    .<span class="function">buttonStyle</span>(.<span class="property">borderedProminent</span>)
+
+<span class="comment">// Fully custom content</span>
+<span class="type">Button</span>(action: { }) {
+    <span class="type">HStack</span> {
+        <span class="type">Image</span>(systemName: <span class="string">"star"</span>)
+        <span class="type">Text</span>(<span class="string">"Custom"</span>)
+    }
+}
+                        </code>
+                    </div>
+                    <div class="diagram-box p-4">
+                        <div class="text-sm text-gray-500 mb-3">What Button gives you:</div>
+                        <ul class="text-xs text-gray-600 space-y-1 mb-3">
+                            <li>✓ Tap/click handling</li>
+                            <li>✓ Keyboard accessibility</li>
+                            <li>✓ Focus ring (macOS)</li>
+                            <li>✓ Pressed state feedback</li>
+                        </ul>
+                        <div class="text-sm text-gray-500 mb-2">Default appearances:</div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-blue-500 text-sm">Tap me</span>
+                            <button class="text-xs border border-gray-300 px-2 py-1 rounded">.bordered</button>
+                            <button class="text-xs bg-blue-500 text-white px-2 py-1 rounded">.borderedProminent</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TextField -->
+            <div class="mb-8">
+                <div class="flex items-center mb-3">
+                    <div class="bg-yellow-100 text-yellow-700 text-xs font-mono px-2 py-1 rounded mr-3">TextField</div>
+                    <span class="text-sm text-gray-500">Text input + keyboard + focus management</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="code-block text-xs">
+                        <code>
+<span class="keyword">@State</span> <span class="keyword">var</span> name = <span class="string">""</span>
+
+<span class="type">TextField</span>(<span class="string">"Placeholder"</span>, text: <span class="property">$name</span>)
+    .<span class="function">textFieldStyle</span>(.<span class="property">roundedBorder</span>)
+
+<span class="comment">// Secure input</span>
+<span class="type">SecureField</span>(<span class="string">"Password"</span>, text: <span class="property">$password</span>)
+
+<span class="comment">// Multi-line</span>
+<span class="type">TextEditor</span>(text: <span class="property">$bio</span>)
+                        </code>
+                    </div>
+                    <div class="diagram-box p-4">
+                        <div class="text-sm text-gray-500 mb-2">What TextField gives you:</div>
+                        <ul class="text-xs text-gray-600 space-y-1 mb-3">
+                            <li>✓ Keyboard presentation</li>
+                            <li>✓ Focus/blur handling</li>
+                            <li>✓ Text selection</li>
+                            <li>✓ Copy/paste support</li>
+                        </ul>
+                        <input type="text" placeholder="Placeholder" class="w-full border border-gray-300 rounded px-2 py-1 text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toggle, Slider, Picker -->
+            <div class="mb-8">
+                <div class="text-sm text-gray-500 mb-4">More controls with strong defaults:</div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <div class="bg-yellow-100 text-yellow-700 text-xs font-mono px-2 py-1 rounded inline-block mb-2">Toggle</div>
+                        <div class="code-block text-xs mb-2">
+                            <code>
+<span class="type">Toggle</span>(<span class="string">"Wi-Fi"</span>, isOn: <span class="property">$wifi</span>)
+                            </code>
+                        </div>
+                        <div class="flex items-center justify-between bg-gray-50 rounded p-2">
+                            <span class="text-sm">Wi-Fi</span>
+                            <div class="w-10 h-6 bg-green-500 rounded-full relative">
+                                <div class="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="bg-yellow-100 text-yellow-700 text-xs font-mono px-2 py-1 rounded inline-block mb-2">Slider</div>
+                        <div class="code-block text-xs mb-2">
+                            <code>
+<span class="type">Slider</span>(value: <span class="property">$volume</span>, in: <span class="string">0</span>...<span class="string">100</span>)
+                            </code>
+                        </div>
+                        <div class="bg-gray-50 rounded p-2">
+                            <input type="range" class="w-full">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="bg-yellow-100 text-yellow-700 text-xs font-mono px-2 py-1 rounded inline-block mb-2">Picker</div>
+                        <div class="code-block text-xs mb-2">
+                            <code>
+<span class="type">Picker</span>(<span class="string">"Size"</span>, selection: <span class="property">$size</span>) {
+    <span class="type">Text</span>(<span class="string">"S"</span>).tag(<span class="string">0</span>)
+}
+                            </code>
+                        </div>
+                        <div class="bg-gray-50 rounded p-2 flex justify-center">
+                            <div class="flex bg-gray-200 rounded-lg p-0.5">
+                                <div class="bg-white rounded px-3 py-1 text-xs shadow">S</div>
+                                <div class="px-3 py-1 text-xs text-gray-500">M</div>
+                                <div class="px-3 py-1 text-xs text-gray-500">L</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customization spectrum -->
+            <div class="diagram-box p-6">
+                <div class="text-sm font-medium text-gray-700 mb-4">Customizing Controls</div>
+                <div class="overflow-x-auto">
+                    <table class="comparison-table text-sm">
+                        <thead>
+                            <tr>
+                                <th>Control</th>
+                                <th>Built-in Styles</th>
+                                <th>Custom Style Protocol</th>
+                                <th>Fully Custom?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-mono">Button</td>
+                                <td class="text-gray-500">.plain, .bordered, .borderedProminent</td>
+                                <td class="font-mono text-blue-600">ButtonStyle</td>
+                                <td class="text-green-600">Yes, easy</td>
+                            </tr>
+                            <tr>
+                                <td class="font-mono">Toggle</td>
+                                <td class="text-gray-500">.switch, .button</td>
+                                <td class="font-mono text-blue-600">ToggleStyle</td>
+                                <td class="text-green-600">Yes</td>
+                            </tr>
+                            <tr>
+                                <td class="font-mono">TextField</td>
+                                <td class="text-gray-500">.plain, .roundedBorder</td>
+                                <td class="font-mono text-blue-600">TextFieldStyle</td>
+                                <td class="text-yellow-600">Partial</td>
+                            </tr>
+                            <tr>
+                                <td class="font-mono">Slider</td>
+                                <td class="text-gray-500">(default only)</td>
+                                <td class="text-gray-400">None</td>
+                                <td class="text-red-600">Build your own</td>
+                            </tr>
+                            <tr>
+                                <td class="font-mono">Picker</td>
+                                <td class="text-gray-500">.menu, .segmented, .wheel</td>
+                                <td class="text-gray-400">None</td>
+                                <td class="text-yellow-600">Limited</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-6 diagram-box p-4 bg-yellow-50 border-yellow-200">
+                <div class="flex items-start">
+                    <span class="text-yellow-600 mr-2">💡</span>
+                    <div class="text-sm text-yellow-800">
+                        <span class="font-medium">For custom UI:</span> Use primitives (Text, Image, Shape) with gesture modifiers (.onTapGesture, .gesture) instead of Button/Toggle when you need full control.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 16 - Containers: The Most Opinionated -->
+        <section class="section" id="s16">
+            <div class="text-sm text-gray-400 font-mono mb-2">16</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Containers: The Most Opinionated</h2>
+            <p class="text-gray-600 mb-6">
+                These control layout AND styling AND behavior. Great when you want platform conventions. Hard to customize deeply.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <!-- List -->
+                <div>
+                    <div class="flex items-center mb-3">
+                        <div class="bg-orange-100 text-orange-700 text-xs font-mono px-2 py-1 rounded mr-3">List</div>
+                        <span class="text-sm text-gray-500">Scrolling rows with system styling</span>
+                    </div>
+                    <div class="code-block text-xs mb-3">
+                        <code>
+<span class="type">List</span> {
+    <span class="type">Text</span>(<span class="string">"Row 1"</span>)
+    <span class="type">Text</span>(<span class="string">"Row 2"</span>)
+    <span class="type">Text</span>(<span class="string">"Row 3"</span>)
+}
+                        </code>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg overflow-hidden border">
+                        <div class="px-4 py-3 border-b text-sm">Row 1</div>
+                        <div class="px-4 py-3 border-b text-sm">Row 2</div>
+                        <div class="px-4 py-3 text-sm">Row 3</div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">Comes with: separators, selection, swipe actions, pull-to-refresh</div>
+                </div>
+
+                <!-- Form -->
+                <div>
+                    <div class="flex items-center mb-3">
+                        <div class="bg-orange-100 text-orange-700 text-xs font-mono px-2 py-1 rounded mr-3">Form</div>
+                        <span class="text-sm text-gray-500">Settings-style layout</span>
+                    </div>
+                    <div class="code-block text-xs mb-3">
+                        <code>
+<span class="type">Form</span> {
+    <span class="type">TextField</span>(<span class="string">"Name"</span>, text: <span class="property">$name</span>)
+    <span class="type">Toggle</span>(<span class="string">"Notify"</span>, isOn: <span class="property">$notify</span>)
+    <span class="type">Picker</span>(<span class="string">"Theme"</span>, selection: <span class="property">$theme</span>) {...}
+}
+                        </code>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg overflow-hidden">
+                        <div class="bg-white mx-0 rounded-lg">
+                            <div class="px-4 py-3 border-b flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Name</span>
+                                <span class="text-sm">John</span>
+                            </div>
+                            <div class="px-4 py-3 border-b flex justify-between items-center">
+                                <span class="text-sm">Notify</span>
+                                <div class="w-8 h-5 bg-green-500 rounded-full relative">
+                                    <div class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full"></div>
+                                </div>
+                            </div>
+                            <div class="px-4 py-3 flex justify-between items-center">
+                                <span class="text-sm">Theme</span>
+                                <span class="text-sm text-gray-500">Auto ›</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">Automatically styles all children</div>
+                </div>
+            </div>
+
+            <div class="diagram-box p-4 bg-orange-50 border-orange-200">
+                <div class="flex items-start">
+                    <span class="text-orange-600 mr-2">⚠</span>
+                    <div class="text-sm text-orange-800">
+                        <span class="font-medium">For custom UI, avoid List and Form.</span> Use ScrollView + VStack + ForEach instead. You'll have full control over styling.
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 code-block text-xs">
+                <code>
+<span class="comment">// Instead of List (hard to customize)</span>
+<span class="type">ScrollView</span> {
+    <span class="type">VStack</span>(spacing: <span class="string">0</span>) {
+        <span class="type">ForEach</span>(items) { item <span class="keyword">in</span>
+            <span class="type">MyCustomRow</span>(item: item)  <span class="comment">// Full control!</span>
+        }
+    }
+}
+                </code>
+            </div>
+        </section>
+
+        <!-- 17 - Layout: Stacks are Flexbox -->
+        <section class="section" id="s17">
+            <div class="text-sm text-gray-400 font-mono mb-2">17</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Layout: Stacks are Flexbox</h2>
+            <p class="text-gray-600 mb-6">
+                The core insight: SwiftUI stacks work just like CSS Flexbox.
+            </p>
+
+            <div class="overflow-x-auto mb-8">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>CSS Flexbox</th>
+                            <th>SwiftUI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-sm">flex-direction: row</td>
+                            <td class="font-mono text-sm text-blue-600">HStack</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">flex-direction: column</td>
+                            <td class="font-mono text-sm text-blue-600">VStack</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">position: absolute + z-index</td>
+                            <td class="font-mono text-sm text-blue-600">ZStack</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">flex: 1 / margin: auto</td>
+                            <td class="font-mono text-sm text-blue-600">Spacer</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Visual demo of all three stacks -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="demo-container p-4 h-32 flex items-center justify-center">
+                        <div class="flex space-x-2">
+                            <div class="w-12 h-12 bg-blue-400 rounded flex items-center justify-center text-white text-xs">A</div>
+                            <div class="w-12 h-12 bg-blue-500 rounded flex items-center justify-center text-white text-xs">B</div>
+                            <div class="w-12 h-12 bg-blue-600 rounded flex items-center justify-center text-white text-xs">C</div>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium mt-2">HStack</div>
+                    <div class="text-xs text-gray-400">horizontal</div>
+                </div>
+                <div class="text-center">
+                    <div class="demo-container p-4 h-32 flex items-center justify-center">
+                        <div class="flex flex-col space-y-2">
+                            <div class="w-12 h-6 bg-green-400 rounded flex items-center justify-center text-white text-xs">A</div>
+                            <div class="w-12 h-6 bg-green-500 rounded flex items-center justify-center text-white text-xs">B</div>
+                            <div class="w-12 h-6 bg-green-600 rounded flex items-center justify-center text-white text-xs">C</div>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium mt-2">VStack</div>
+                    <div class="text-xs text-gray-400">vertical</div>
+                </div>
+                <div class="text-center">
+                    <div class="demo-container p-4 h-32 flex items-center justify-center">
+                        <div class="relative w-20 h-20">
+                            <div class="absolute inset-0 bg-purple-300 rounded"></div>
+                            <div class="absolute inset-2 bg-purple-400 rounded"></div>
+                            <div class="absolute inset-4 bg-purple-500 rounded flex items-center justify-center text-white text-xs">Top</div>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium mt-2">ZStack</div>
+                    <div class="text-xs text-gray-400">layered</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 18 - HStack -->
+        <section class="section" id="s14">
+            <div class="text-sm text-gray-400 font-mono mb-2">18</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">HStack (Horizontal)</h2>
+            <p class="text-gray-600 mb-6">
+                Arranges children in a horizontal line. Like flex-direction: row.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="code-block">
+                    <code>
+<span class="type">HStack</span> {
+    <span class="type">Text</span>(<span class="string">"Left"</span>)
+    <span class="type">Text</span>(<span class="string">"Center"</span>)
+    <span class="type">Text</span>(<span class="string">"Right"</span>)
+}
+                    </code>
+                </div>
+                <div class="demo-container p-6 flex items-center justify-center">
+                    <div class="flex space-x-4">
+                        <div class="bg-blue-100 text-blue-700 px-4 py-2 rounded">Left</div>
+                        <div class="bg-blue-100 text-blue-700 px-4 py-2 rounded">Center</div>
+                        <div class="bg-blue-100 text-blue-700 px-4 py-2 rounded">Right</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 19 - VStack -->
+        <section class="section" id="s19">
+            <div class="text-sm text-gray-400 font-mono mb-2">19</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">VStack (Vertical)</h2>
+            <p class="text-gray-600 mb-6">
+                Arranges children in a vertical column. Like flex-direction: column.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="code-block">
+                    <code>
+<span class="type">VStack</span> {
+    <span class="type">Text</span>(<span class="string">"Top"</span>)
+    <span class="type">Text</span>(<span class="string">"Middle"</span>)
+    <span class="type">Text</span>(<span class="string">"Bottom"</span>)
+}
+                    </code>
+                </div>
+                <div class="demo-container p-6 flex items-center justify-center">
+                    <div class="flex flex-col space-y-2">
+                        <div class="bg-green-100 text-green-700 px-4 py-2 rounded text-center">Top</div>
+                        <div class="bg-green-100 text-green-700 px-4 py-2 rounded text-center">Middle</div>
+                        <div class="bg-green-100 text-green-700 px-4 py-2 rounded text-center">Bottom</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 20 - ZStack -->
+        <section class="section" id="s20">
+            <div class="text-sm text-gray-400 font-mono mb-2">20</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">ZStack (Depth)</h2>
+            <p class="text-gray-600 mb-6">
+                Overlays children on top of each other. Like position: absolute with z-index.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="code-block">
+                    <code>
+<span class="type">ZStack</span> {
+    <span class="type">Rectangle</span>()
+        .<span class="function">fill</span>(.<span class="property">blue</span>)
+    <span class="type">Text</span>(<span class="string">"On Top"</span>)
+        .<span class="function">foregroundColor</span>(.<span class="property">white</span>)
+}
+                    </code>
+                </div>
+                <div class="demo-container p-6 flex items-center justify-center">
+                    <div class="relative">
+                        <div class="w-32 h-24 bg-blue-500 rounded-lg"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-white font-medium">On Top</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 21 - Spacer -->
+        <section class="section" id="s21">
+            <div class="text-sm text-gray-400 font-mono mb-2">21</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Spacer (The Magic Push)</h2>
+            <p class="text-gray-600 mb-6">
+                Expands to fill available space. Like flex: 1 or margin: auto.
+            </p>
+
+            <div class="code-block mb-6">
+                <code>
+<span class="type">HStack</span> {
+    <span class="type">Text</span>(<span class="string">"Left"</span>)
+    <span class="type">Spacer</span>()
+    <span class="type">Text</span>(<span class="string">"Right"</span>)
+}
+                </code>
+            </div>
+
+            <!-- Interactive Spacer demo -->
+            <div class="demo-container p-6">
+                <div class="text-sm text-gray-400 mb-4">Spacer pushes elements apart:</div>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <div class="bg-orange-100 text-orange-700 px-3 py-1 rounded text-sm">Left</div>
+                            <div class="flex-1 mx-2 h-px bg-orange-200 relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="bg-white px-2 text-xs text-orange-400">Spacer()</span>
+                                </div>
+                            </div>
+                            <div class="bg-orange-100 text-orange-700 px-3 py-1 rounded text-sm">Right</div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <div class="flex-1 mr-2 h-px bg-orange-200 relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="bg-white px-2 text-xs text-orange-400">Spacer()</span>
+                                </div>
+                            </div>
+                            <div class="bg-orange-100 text-orange-700 px-3 py-1 rounded text-sm">Pushed Right</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mt-2">Spacer() at the start pushes content right</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 22 - Combining Stacks -->
+        <section class="section" id="s22">
+            <div class="text-sm text-gray-400 font-mono mb-2">22</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Combining Stacks</h2>
+            <p class="text-gray-600 mb-6">
+                Nest stacks to create complex layouts. Just like nesting divs with flexbox.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="code-block text-xs">
+                    <code>
+<span class="type">HStack</span> {
+    <span class="type">Image</span>(systemName: <span class="string">"person"</span>)
+        .<span class="function">frame</span>(width: <span class="string">60</span>, height: <span class="string">60</span>)
+
+    <span class="type">VStack</span>(alignment: .<span class="property">leading</span>) {
+        <span class="type">Text</span>(<span class="string">"John Appleseed"</span>)
+            .<span class="function">font</span>(.<span class="property">headline</span>)
+        <span class="type">Text</span>(<span class="string">"iOS Developer"</span>)
+            .<span class="function">foregroundColor</span>(.<span class="property">secondary</span>)
+    }
+
+    <span class="type">Spacer</span>()
+
+    <span class="type">Image</span>(systemName: <span class="string">"chevron.right"</span>)
+}
+                    </code>
+                </div>
+                <div class="demo-container p-4">
+                    <!-- Card breakdown visualization -->
+                    <div class="border-2 border-dashed border-blue-300 rounded-lg p-3 bg-blue-50">
+                        <div class="text-xs text-blue-500 mb-2 font-mono">HStack</div>
+                        <div class="flex items-center bg-white rounded-lg p-3">
+                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 text-xl">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3 border-2 border-dashed border-green-300 rounded p-2 bg-green-50">
+                                <div class="text-xs text-green-500 mb-1 font-mono">VStack</div>
+                                <div class="font-medium text-sm">John Appleseed</div>
+                                <div class="text-gray-500 text-xs">iOS Developer</div>
+                            </div>
+                            <div class="flex-1 mx-2 text-center">
+                                <div class="text-xs text-orange-400 font-mono">Spacer</div>
+                            </div>
+                            <div class="text-gray-400">&rsaquo;</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 23 - Alignment & Spacing -->
+        <section class="section" id="s23">
+            <div class="text-sm text-gray-400 font-mono mb-2">23</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Alignment & Spacing</h2>
+            <p class="text-gray-600 mb-6">
+                Control alignment and gaps. Like align-items and gap in CSS.
+            </p>
+
+            <div class="code-block mb-6">
+                <code>
+<span class="type">VStack</span>(alignment: .<span class="property">leading</span>, spacing: <span class="string">16</span>) {
+    <span class="type">Text</span>(<span class="string">"First"</span>)
+    <span class="type">Text</span>(<span class="string">"Second"</span>)
+    <span class="type">Text</span>(<span class="string">"Third"</span>)
+}
+                </code>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="demo-container p-4 h-32">
+                        <div class="flex flex-col items-start space-y-2 h-full">
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">First</div>
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">Second</div>
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">Third</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2 font-mono">.leading</div>
+                </div>
+                <div class="text-center">
+                    <div class="demo-container p-4 h-32">
+                        <div class="flex flex-col items-center space-y-2 h-full">
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">First</div>
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">Second</div>
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">Third</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2 font-mono">.center</div>
+                </div>
+                <div class="text-center">
+                    <div class="demo-container p-4 h-32">
+                        <div class="flex flex-col items-end space-y-2 h-full">
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">First</div>
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">Second</div>
+                            <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">Third</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2 font-mono">.trailing</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 24 - Frames & Sizing -->
+        <section class="section" id="s24">
+            <div class="text-sm text-gray-400 font-mono mb-2">24</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Frames & Sizing</h2>
+            <p class="text-gray-600 mb-6">
+                SwiftUI uses intrinsic sizing by default. Use .frame() for explicit sizes.
+            </p>
+
+            <div class="overflow-x-auto mb-6">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>CSS</th>
+                            <th>SwiftUI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-sm">width: 100px</td>
+                            <td class="font-mono text-sm">.frame(width: 100)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">width: 100%</td>
+                            <td class="font-mono text-sm">.frame(maxWidth: .infinity)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-sm">min-width: 100px</td>
+                            <td class="font-mono text-sm">.frame(minWidth: 100)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="diagram-box p-6">
+                <div class="text-sm text-gray-500 mb-4">Key difference: SwiftUI views size to their content by default</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xs text-gray-400 mb-2">CSS (explicit sizing needed)</div>
+                        <div class="border border-gray-300 p-4 h-24">
+                            <div class="bg-blue-100 text-blue-700 text-sm px-2 py-1 rounded inline-block">Button needs width</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-400 mb-2">SwiftUI (intrinsic sizing)</div>
+                        <div class="border border-gray-300 p-4 h-24 flex items-start">
+                            <div class="bg-green-100 text-green-700 text-sm px-2 py-1 rounded">Sizes to content</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 25 - Padding & Modifiers -->
+        <section class="section" id="s25">
+            <div class="text-sm text-gray-400 font-mono mb-2">25</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Padding & Modifiers</h2>
+            <p class="text-gray-600 mb-6">
+                Modifiers chain like method calls. Order matters! (Unlike CSS)
+            </p>
+
+            <div class="code-block mb-6">
+                <code>
+<span class="type">Text</span>(<span class="string">"Hello"</span>)
+    .<span class="function">padding</span>()
+    .<span class="function">background</span>(<span class="type">Color</span>.<span class="property">blue</span>)
+    .<span class="function">cornerRadius</span>(<span class="string">8</span>)
+                </code>
+            </div>
+
+            <!-- Modifier order demonstration -->
+            <div class="diagram-box p-6">
+                <div class="text-sm text-gray-500 mb-4">Order matters! Compare these:</div>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <div class="text-xs font-mono text-gray-400 mb-2">padding → background</div>
+                        <div class="flex justify-center">
+                            <div class="bg-blue-500 rounded-lg">
+                                <div class="px-6 py-3 text-white">Hello</div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2 text-center">Background includes padding</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-mono text-gray-400 mb-2">background → padding</div>
+                        <div class="flex justify-center">
+                            <div class="p-4">
+                                <div class="bg-blue-500 rounded-lg px-2 py-1 text-white">Hello</div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2 text-center">Padding outside background</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 26 - State: @State is useState -->
+        <section class="section" id="s26">
+            <div class="text-sm text-gray-400 font-mono mb-2">26</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">State: @State is useState</h2>
+            <p class="text-gray-600 mb-6">
+                @State creates reactive state. When it changes, the view re-renders.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="code-block">
+                    <code>
+<span class="keyword">struct</span> <span class="type">Counter</span>: <span class="type">View</span> {
+    <span class="keyword">@State</span> <span class="keyword">private var</span> count = <span class="string">0</span>
+
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="type">Button</span>(<span class="string">"Count: \(count)"</span>) {
+            count += <span class="string">1</span>
+        }
+    }
+}
+                    </code>
+                </div>
+                <div class="demo-container p-6 flex items-center justify-center">
+                    <button
+                        id="counter-btn"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                        onclick="this.textContent = 'Count: ' + (parseInt(this.textContent.split(': ')[1]) + 1)"
+                    >
+                        Count: 0
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">React equivalent</div>
+                    <div class="code-block">
+                        <code>
+<span class="keyword">function</span> <span class="function">Counter</span>() {
+    <span class="keyword">const</span> [count, setCount] = <span class="function">useState</span>(<span class="string">0</span>)
+
+    <span class="keyword">return</span> (
+        <span class="string">&lt;button</span> onClick={() => setCount(c => c + 1)}<span class="string">&gt;</span>
+            Count: {count}
+        <span class="string">&lt;/button&gt;</span>
+    )
+}
+                        </code>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-500 flex items-center">
+                    <div>
+                        <p class="mb-2"><span class="font-medium">@State</span> = property wrapper for local state</p>
+                        <p class="mb-2"><span class="font-medium">private</span> = only this view owns it</p>
+                        <p>Mutating count triggers re-render automatically</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 27 - Styling: The Mental Model -->
+        <section class="section" id="s27">
+            <div class="text-sm text-gray-400 font-mono mb-2">27</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Styling: The Mental Model</h2>
+            <p class="text-gray-600 mb-6">
+                CSS applies styles via selectors. SwiftUI applies them inline via modifiers. Same goal, different approach.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">CSS/Tailwind</div>
+                    <div class="code-block">
+                        <code>
+<span class="comment">&lt;!-- Styles live separately --&gt;</span>
+<span class="string">&lt;div class="p-4 bg-blue-500 rounded-lg"&gt;</span>
+    Hello
+<span class="string">&lt;/div&gt;</span>
+
+<span class="comment">/* Or in CSS */</span>
+.card {
+    padding: 16px;
+    background: blue;
+    border-radius: 8px;
+}
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI</div>
+                    <div class="code-block">
+                        <code>
+<span class="comment">// Styles are inline modifiers</span>
+<span class="type">Text</span>(<span class="string">"Hello"</span>)
+    .<span class="function">padding</span>(<span class="string">16</span>)
+    .<span class="function">background</span>(<span class="type">Color</span>.<span class="property">blue</span>)
+    .<span class="function">cornerRadius</span>(<span class="string">8</span>)
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diagram-box p-6">
+                <div class="text-sm font-medium text-gray-700 mb-4">Key Differences</div>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-start">
+                        <span class="text-blue-500 mr-3">1.</span>
+                        <div><span class="font-medium">No cascade</span> &mdash; modifiers apply directly to the view, no inheritance surprises</div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-blue-500 mr-3">2.</span>
+                        <div><span class="font-medium">Order matters</span> &mdash; .padding().background() ≠ .background().padding()</div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-blue-500 mr-3">3.</span>
+                        <div><span class="font-medium">Type-safe</span> &mdash; compiler catches typos (no "colour" bugs)</div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-blue-500 mr-3">4.</span>
+                        <div><span class="font-medium">Composable</span> &mdash; extract modifiers into reusable ViewModifiers</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 28 - CSS Properties → SwiftUI Modifiers -->
+        <section class="section" id="s28">
+            <div class="text-sm text-gray-400 font-mono mb-2">28</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">CSS Properties → SwiftUI Modifiers</h2>
+            <p class="text-gray-600 mb-6">
+                Your Tailwind knowledge maps directly. Here's the translation table.
+            </p>
+
+            <div class="overflow-x-auto mb-6">
+                <table class="comparison-table text-sm">
+                    <thead>
+                        <tr>
+                            <th>CSS / Tailwind</th>
+                            <th>SwiftUI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono">padding: 16px / p-4</td>
+                            <td class="font-mono text-blue-600">.padding(16)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">padding-left: 8px / pl-2</td>
+                            <td class="font-mono text-blue-600">.padding(.leading, 8)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">margin: auto</td>
+                            <td class="font-mono text-blue-600">Spacer() or .frame(maxWidth: .infinity)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">background-color / bg-blue-500</td>
+                            <td class="font-mono text-blue-600">.background(Color.blue)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">color / text-white</td>
+                            <td class="font-mono text-blue-600">.foregroundColor(.white)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">border-radius / rounded-lg</td>
+                            <td class="font-mono text-blue-600">.cornerRadius(8) or .clipShape(RoundedRectangle(...))</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">border: 1px solid / border</td>
+                            <td class="font-mono text-blue-600">.border(Color.gray, width: 1)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">box-shadow / shadow-lg</td>
+                            <td class="font-mono text-blue-600">.shadow(radius: 10)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">opacity: 0.5 / opacity-50</td>
+                            <td class="font-mono text-blue-600">.opacity(0.5)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">font-size / text-lg</td>
+                            <td class="font-mono text-blue-600">.font(.title) or .font(.system(size: 18))</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">font-weight: bold / font-bold</td>
+                            <td class="font-mono text-blue-600">.fontWeight(.bold)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">line-height / leading-relaxed</td>
+                            <td class="font-mono text-blue-600">.lineSpacing(8)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">text-align: center / text-center</td>
+                            <td class="font-mono text-blue-600">.multilineTextAlignment(.center)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">overflow: hidden</td>
+                            <td class="font-mono text-blue-600">.clipped()</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">transform: rotate(45deg)</td>
+                            <td class="font-mono text-blue-600">.rotationEffect(.degrees(45))</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono">transform: scale(1.1)</td>
+                            <td class="font-mono text-blue-600">.scaleEffect(1.1)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="diagram-box p-4 bg-yellow-50 border-yellow-200">
+                <div class="flex items-start">
+                    <span class="text-yellow-600 mr-2">⚠</span>
+                    <div class="text-sm text-yellow-800">
+                        <span class="font-medium">No margin in SwiftUI!</span> Use padding on the parent, Spacer(), or .frame() with alignment. SwiftUI's layout model is different.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 29 - Modifier Order Matters -->
+        <section class="section" id="s29">
+            <div class="text-sm text-gray-400 font-mono mb-2">29</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Modifier Order Matters</h2>
+            <p class="text-gray-600 mb-6">
+                In CSS, property order rarely matters. In SwiftUI, each modifier wraps the previous result. Think of it like Russian nesting dolls.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">padding → background → border</div>
+                    <div class="code-block text-xs mb-4">
+                        <code>
+<span class="type">Text</span>(<span class="string">"Hello"</span>)
+    .<span class="function">padding</span>(<span class="string">20</span>)
+    .<span class="function">background</span>(<span class="type">Color</span>.<span class="property">blue</span>)
+    .<span class="function">border</span>(<span class="type">Color</span>.<span class="property">red</span>, width: <span class="string">3</span>)
+                        </code>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="border-[3px] border-red-500">
+                            <div class="bg-blue-500 p-5 text-white">Hello</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2 text-center">Border wraps the padded blue box</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">background → padding → border</div>
+                    <div class="code-block text-xs mb-4">
+                        <code>
+<span class="type">Text</span>(<span class="string">"Hello"</span>)
+    .<span class="function">background</span>(<span class="type">Color</span>.<span class="property">blue</span>)
+    .<span class="function">padding</span>(<span class="string">20</span>)
+    .<span class="function">border</span>(<span class="type">Color</span>.<span class="property">red</span>, width: <span class="string">3</span>)
+                        </code>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="border-[3px] border-red-500 p-5">
+                            <div class="bg-blue-500 px-1 text-white">Hello</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2 text-center">Border wraps padding around small blue box</div>
+                </div>
+            </div>
+
+            <div class="diagram-box p-6">
+                <div class="text-sm font-medium text-gray-700 mb-4">Visualizing the wrapping:</div>
+                <div class="flex items-center justify-center space-x-8">
+                    <div class="text-center">
+                        <div class="relative inline-block">
+                            <div class="border-2 border-dashed border-gray-300 p-3 rounded">
+                                <div class="border-2 border-dashed border-blue-300 p-2 rounded bg-blue-50">
+                                    <div class="bg-white rounded px-2 py-1 text-sm">Text</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2">Each modifier wraps the result</div>
+                    </div>
+                    <div class="text-gray-300">=</div>
+                    <div class="text-center text-xs text-gray-500">
+                        <div class="space-y-1 font-mono">
+                            <div class="text-gray-400">.border (outer)</div>
+                            <div class="text-blue-500">.background (middle)</div>
+                            <div class="text-gray-600">Text (inner)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 30 - Reusable Styles with ViewModifier -->
+        <section class="section" id="s30">
+            <div class="text-sm text-gray-400 font-mono mb-2">30</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Reusable Styles with ViewModifier</h2>
+            <p class="text-gray-600 mb-6">
+                Like Tailwind's @apply or CSS classes. Bundle modifiers into reusable units.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">Tailwind @apply</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">/* Define once */</span>
+.btn-primary {
+    @apply px-4 py-2 bg-blue-500
+           text-white rounded-lg
+           font-semibold;
+}
+
+<span class="comment">&lt;!-- Use anywhere --&gt;</span>
+<span class="string">&lt;button class="btn-primary"&gt;</span>
+    Save
+<span class="string">&lt;/button&gt;</span>
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI ViewModifier</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Define once</span>
+<span class="keyword">struct</span> <span class="type">PrimaryButton</span>: <span class="type">ViewModifier</span> {
+    <span class="keyword">func</span> <span class="function">body</span>(content: <span class="type">Content</span>) -> <span class="keyword">some</span> <span class="type">View</span> {
+        content
+            .<span class="function">padding</span>(.<span class="property">horizontal</span>, <span class="string">16</span>)
+            .<span class="function">padding</span>(.<span class="property">vertical</span>, <span class="string">8</span>)
+            .<span class="function">background</span>(<span class="type">Color</span>.<span class="property">blue</span>)
+            .<span class="function">foregroundColor</span>(.<span class="property">white</span>)
+            .<span class="function">cornerRadius</span>(<span class="string">8</span>)
+            .<span class="function">fontWeight</span>(.<span class="property">semibold</span>)
+    }
+}
+
+<span class="comment">// Use anywhere</span>
+<span class="type">Button</span>(<span class="string">"Save"</span>) { ... }
+    .<span class="function">modifier</span>(<span class="type">PrimaryButton</span>())
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block mb-4">
+                <code>
+<span class="comment">// Pro tip: Create an extension for cleaner syntax</span>
+<span class="keyword">extension</span> <span class="type">View</span> {
+    <span class="keyword">func</span> <span class="function">primaryButtonStyle</span>() -> <span class="keyword">some</span> <span class="type">View</span> {
+        <span class="function">modifier</span>(<span class="type">PrimaryButton</span>())
+    }
+}
+
+<span class="comment">// Now use it like a native modifier</span>
+<span class="type">Button</span>(<span class="string">"Save"</span>) { ... }
+    .<span class="function">primaryButtonStyle</span>()
+                </code>
+            </div>
+        </section>
+
+        <!-- 31 - Design Tokens -->
+        <section class="section" id="s31">
+            <div class="text-sm text-gray-400 font-mono mb-2">31</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Design Tokens: Colors, Typography, Spacing</h2>
+            <p class="text-gray-600 mb-6">
+                Like Tailwind's config or CSS custom properties. Centralize your design values.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">Tailwind Config / CSS Vars</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// tailwind.config.js</span>
+colors: {
+    brand: {
+        primary: '#007AFF',
+        secondary: '#5856D6',
+    }
+}
+
+<span class="comment">/* or CSS variables */</span>
+:root {
+    --color-primary: #007AFF;
+    --spacing-md: 16px;
+}
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Define in a Theme enum/struct</span>
+<span class="keyword">enum</span> <span class="type">Theme</span> {
+    <span class="keyword">enum</span> <span class="type">Colors</span> {
+        <span class="keyword">static let</span> primary = <span class="type">Color</span>(<span class="string">"Primary"</span>)
+        <span class="keyword">static let</span> secondary = <span class="type">Color</span>.<span class="property">purple</span>
+    }
+    <span class="keyword">enum</span> <span class="type">Spacing</span> {
+        <span class="keyword">static let</span> sm: <span class="type">CGFloat</span> = <span class="string">8</span>
+        <span class="keyword">static let</span> md: <span class="type">CGFloat</span> = <span class="string">16</span>
+        <span class="keyword">static let</span> lg: <span class="type">CGFloat</span> = <span class="string">24</span>
+    }
+    <span class="keyword">enum</span> <span class="type">Typography</span> {
+        <span class="keyword">static let</span> heading = <span class="type">Font</span>.<span class="property">title</span>.<span class="function">weight</span>(.<span class="property">bold</span>)
+        <span class="keyword">static let</span> body = <span class="type">Font</span>.<span class="property">body</span>
+    }
+}
+
+<span class="comment">// Use it</span>
+<span class="type">Text</span>(<span class="string">"Title"</span>)
+    .<span class="function">font</span>(<span class="type">Theme</span>.<span class="type">Typography</span>.<span class="property">heading</span>)
+    .<span class="function">foregroundColor</span>(<span class="type">Theme</span>.<span class="type">Colors</span>.<span class="property">primary</span>)
+    .<span class="function">padding</span>(<span class="type">Theme</span>.<span class="type">Spacing</span>.<span class="property">md</span>)
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diagram-box p-4 bg-blue-50 border-blue-200">
+                <div class="flex items-start">
+                    <span class="text-blue-600 mr-2">💡</span>
+                    <div class="text-sm text-blue-800">
+                        <span class="font-medium">Asset Catalogs:</span> Define colors in Xcode's Asset Catalog for automatic dark mode support. Reference with <code class="bg-blue-100 px-1 rounded">Color("ColorName")</code>.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 32 - Semantic Colors -->
+        <section class="section" id="s32">
+            <div class="text-sm text-gray-400 font-mono mb-2">32</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Semantic Colors (Auto Dark Mode)</h2>
+            <p class="text-gray-600 mb-6">
+                SwiftUI has built-in semantic colors that automatically adapt to light/dark mode. No media queries needed.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">CSS (manual dark mode)</div>
+                    <div class="code-block text-xs">
+                        <code>
+.text {
+    color: #000;
+}
+@media (prefers-color-scheme: dark) {
+    .text { color: #fff; }
+}
+
+.card {
+    background: #f5f5f5;
+}
+@media (prefers-color-scheme: dark) {
+    .card { background: #1a1a1a; }
+}
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI (automatic)</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Just works. Adapts automatically.</span>
+<span class="type">Text</span>(<span class="string">"Hello"</span>)
+    .<span class="function">foregroundColor</span>(.<span class="property">primary</span>)
+
+<span class="type">Rectangle</span>()
+    .<span class="function">fill</span>(<span class="type">Color</span>(.<span class="property">systemBackground</span>))
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diagram-box p-6">
+                <div class="text-sm font-medium text-gray-700 mb-4">Built-in Semantic Colors</div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded bg-gray-900 mr-2"></div>
+                            <code class="text-xs">.primary</code>
+                            <span class="text-gray-400 text-xs ml-2">main text</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded bg-gray-500 mr-2"></div>
+                            <code class="text-xs">.secondary</code>
+                            <span class="text-gray-400 text-xs ml-2">subtitles</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded bg-blue-500 mr-2"></div>
+                            <code class="text-xs">.accentColor</code>
+                            <span class="text-gray-400 text-xs ml-2">interactive</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded bg-gray-100 border mr-2"></div>
+                            <code class="text-xs">Color(.systemBackground)</code>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded bg-gray-200 border mr-2"></div>
+                            <code class="text-xs">Color(.secondarySystemBackground)</code>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded bg-gray-300 border mr-2"></div>
+                            <code class="text-xs">Color(.separator)</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 33 - Conditional Styling -->
+        <section class="section" id="s33">
+            <div class="text-sm text-gray-400 font-mono mb-2">33</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Conditional Styling (Hover, Pressed, Disabled)</h2>
+            <p class="text-gray-600 mb-6">
+                Like :hover, :active, :disabled in CSS. SwiftUI uses state in ButtonStyle or direct conditionals.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">CSS pseudo-classes</div>
+                    <div class="code-block text-xs">
+                        <code>
+.button {
+    background: blue;
+}
+.button:hover {
+    background: darkblue;
+}
+.button:active {
+    transform: scale(0.98);
+}
+.button:disabled {
+    opacity: 0.5;
+}
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI ButtonStyle</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="keyword">struct</span> <span class="type">MyButtonStyle</span>: <span class="type">ButtonStyle</span> {
+    <span class="keyword">func</span> <span class="function">makeBody</span>(configuration: <span class="type">Config</span>)
+        -> <span class="keyword">some</span> <span class="type">View</span> {
+        configuration.label
+            .<span class="function">background</span>(
+                configuration.<span class="property">isPressed</span>
+                    ? <span class="type">Color</span>.<span class="property">blue</span>.<span class="function">opacity</span>(<span class="string">0.8</span>)
+                    : <span class="type">Color</span>.<span class="property">blue</span>
+            )
+            .<span class="function">scaleEffect</span>(
+                configuration.<span class="property">isPressed</span>
+                    ? <span class="string">0.98</span> : <span class="string">1.0</span>
+            )
+    }
+}
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block mb-4">
+                <code>
+<span class="comment">// For hover (macOS), use .onHover modifier</span>
+<span class="keyword">@State</span> <span class="keyword">private var</span> isHovered = <span class="keyword">false</span>
+
+<span class="type">Text</span>(<span class="string">"Hover me"</span>)
+    .<span class="function">foregroundColor</span>(isHovered ? .<span class="property">blue</span> : .<span class="property">primary</span>)
+    .<span class="function">onHover</span> { hovering <span class="keyword">in</span>
+        isHovered = hovering
+    }
+
+<span class="comment">// For disabled state</span>
+<span class="type">Button</span>(<span class="string">"Submit"</span>) { }
+    .<span class="function">disabled</span>(isLoading)  <span class="comment">// grays out automatically</span>
+                </code>
+            </div>
+        </section>
+
+        <!-- 34 - Theming with @Environment -->
+        <section class="section" id="s34">
+            <div class="text-sm text-gray-400 font-mono mb-2">34</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Theming with @Environment</h2>
+            <p class="text-gray-600 mb-6">
+                Like React Context or CSS custom properties cascading down. Inject values through the view hierarchy.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">React Context</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Provider at top</span>
+&lt;<span class="type">ThemeContext</span>.<span class="type">Provider</span> value={theme}&gt;
+    &lt;<span class="type">App</span> /&gt;
+&lt;/<span class="type">ThemeContext</span>.<span class="type">Provider</span>&gt;
+
+<span class="comment">// Consume anywhere below</span>
+<span class="keyword">const</span> theme = <span class="function">useContext</span>(<span class="type">ThemeContext</span>)
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI @Environment</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="comment">// Inject at top</span>
+<span class="type">ContentView</span>()
+    .<span class="function">environment</span>(\.<span class="property">myTheme</span>, customTheme)
+
+<span class="comment">// Read anywhere below</span>
+<span class="keyword">@Environment</span>(\.<span class="property">myTheme</span>) <span class="keyword">var</span> theme
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block text-xs">
+                <code>
+<span class="comment">// Define custom environment key</span>
+<span class="keyword">struct</span> <span class="type">ThemeKey</span>: <span class="type">EnvironmentKey</span> {
+    <span class="keyword">static let</span> defaultValue = <span class="type">Theme</span>.<span class="property">light</span>
+}
+
+<span class="keyword">extension</span> <span class="type">EnvironmentValues</span> {
+    <span class="keyword">var</span> myTheme: <span class="type">Theme</span> {
+        <span class="keyword">get</span> { <span class="keyword">self</span>[<span class="type">ThemeKey</span>.<span class="keyword">self</span>] }
+        <span class="keyword">set</span> { <span class="keyword">self</span>[<span class="type">ThemeKey</span>.<span class="keyword">self</span>] = newValue }
+    }
+}
+
+<span class="comment">// Built-in environment values you can read:</span>
+<span class="keyword">@Environment</span>(\.<span class="property">colorScheme</span>) <span class="keyword">var</span> colorScheme      <span class="comment">// .light or .dark</span>
+<span class="keyword">@Environment</span>(\.<span class="property">sizeCategory</span>) <span class="keyword">var</span> sizeCategory    <span class="comment">// Dynamic Type size</span>
+<span class="keyword">@Environment</span>(\.<span class="property">locale</span>) <span class="keyword">var</span> locale                <span class="comment">// User's locale</span>
+                </code>
+            </div>
+        </section>
+
+        <!-- 35 - Responsive Design -->
+        <section class="section" id="s35">
+            <div class="text-sm text-gray-400 font-mono mb-2">35</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Responsive Design</h2>
+            <p class="text-gray-600 mb-6">
+                Like media queries, but simpler. Use GeometryReader for sizes, @Environment for traits.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">CSS media queries</div>
+                    <div class="code-block text-xs">
+                        <code>
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI GeometryReader</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="type">GeometryReader</span> { geo <span class="keyword">in</span>
+    <span class="keyword">if</span> geo.size.width > <span class="string">600</span> {
+        <span class="type">HStack</span> {
+            <span class="type">Sidebar</span>()
+            <span class="type">Content</span>()
+        }
+    } <span class="keyword">else</span> {
+        <span class="type">VStack</span> {
+            <span class="type">Content</span>()
+        }
+    }
+}
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block mb-4">
+                <code>
+<span class="comment">// Or use horizontal size class for iPad/Mac vs iPhone</span>
+<span class="keyword">@Environment</span>(\.<span class="property">horizontalSizeClass</span>) <span class="keyword">var</span> sizeClass
+
+<span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> {
+    <span class="keyword">if</span> sizeClass == .<span class="property">compact</span> {
+        <span class="comment">// iPhone-style layout</span>
+        <span class="type">TabView</span> { ... }
+    } <span class="keyword">else</span> {
+        <span class="comment">// iPad/Mac sidebar layout</span>
+        <span class="type">NavigationSplitView</span> { ... }
+    }
+}
+                </code>
+            </div>
+
+            <div class="diagram-box p-4 bg-green-50 border-green-200">
+                <div class="flex items-start">
+                    <span class="text-green-600 mr-2">✓</span>
+                    <div class="text-sm text-green-800">
+                        <span class="font-medium">SwiftUI adapts automatically</span> in many cases. NavigationStack, Form, and system controls adjust for device size without manual breakpoints.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 36 - Animations & Transitions -->
+        <section class="section" id="s36">
+            <div class="text-sm text-gray-400 font-mono mb-2">36</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Animations & Transitions</h2>
+            <p class="text-gray-600 mb-6">
+                Like CSS transitions, but declarative. Just say what should animate, SwiftUI handles the rest.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">CSS transitions</div>
+                    <div class="code-block text-xs">
+                        <code>
+.box {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.3s ease-in-out;
+}
+.box.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+}
+                        </code>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-400 mb-2 font-mono">SwiftUI animations</div>
+                    <div class="code-block text-xs">
+                        <code>
+<span class="keyword">@State</span> <span class="keyword">var</span> isVisible = <span class="keyword">true</span>
+
+<span class="type">Rectangle</span>()
+    .<span class="function">opacity</span>(isVisible ? <span class="string">1</span> : <span class="string">0</span>)
+    .<span class="function">scaleEffect</span>(isVisible ? <span class="string">1</span> : <span class="string">0.8</span>)
+    .<span class="function">animation</span>(.<span class="function">easeInOut</span>(duration: <span class="string">0.3</span>), value: isVisible)
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block mb-4">
+                <code>
+<span class="comment">// Implicit animation: animate ALL changes to a view</span>
+<span class="type">Circle</span>()
+    .<span class="function">frame</span>(width: expanded ? <span class="string">200</span> : <span class="string">100</span>)
+    .<span class="function">animation</span>(.<span class="property">spring</span>(), value: expanded)
+
+<span class="comment">// Explicit animation: wrap state change in withAnimation</span>
+<span class="type">Button</span>(<span class="string">"Toggle"</span>) {
+    <span class="function">withAnimation</span>(.<span class="property">easeInOut</span>) {
+        isExpanded.<span class="function">toggle</span>()
+    }
+}
+
+<span class="comment">// View transitions (enter/exit)</span>
+<span class="keyword">if</span> showDetails {
+    <span class="type">DetailsView</span>()
+        .<span class="function">transition</span>(.<span class="property">slide</span>)  <span class="comment">// or .opacity, .scale, .move(edge:)</span>
+}
+                </code>
+            </div>
+
+            <div class="diagram-box p-6">
+                <div class="text-sm font-medium text-gray-700 mb-4">Animation Curves</div>
+                <div class="grid grid-cols-4 gap-3 text-center text-xs">
+                    <div>
+                        <div class="h-8 bg-gray-100 rounded flex items-end justify-center pb-1">
+                            <div class="w-8 h-1 bg-blue-500 rounded"></div>
+                        </div>
+                        <div class="font-mono text-gray-500 mt-1">.linear</div>
+                    </div>
+                    <div>
+                        <div class="h-8 bg-gray-100 rounded flex items-end justify-center pb-1">
+                            <div class="w-8 h-1 bg-blue-500 rounded"></div>
+                        </div>
+                        <div class="font-mono text-gray-500 mt-1">.easeIn</div>
+                    </div>
+                    <div>
+                        <div class="h-8 bg-gray-100 rounded flex items-end justify-center pb-1">
+                            <div class="w-8 h-1 bg-blue-500 rounded"></div>
+                        </div>
+                        <div class="font-mono text-gray-500 mt-1">.easeOut</div>
+                    </div>
+                    <div>
+                        <div class="h-8 bg-gray-100 rounded flex items-end justify-center pb-1">
+                            <div class="w-8 h-1 bg-purple-500 rounded"></div>
+                        </div>
+                        <div class="font-mono text-gray-500 mt-1">.spring()</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 37 - UI Testing -->
+        <section class="section" id="s37">
+            <div class="text-sm text-gray-400 font-mono mb-2">37</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">UI Testing: XCUITest is Your Playwright</h2>
+            <p class="text-gray-600 mb-6">
+                Apple has built-in UI testing. Find elements, simulate taps, assert state.
+            </p>
+
+            <!-- Comparison table -->
+            <div class="diagram-box p-4 mb-6">
+                <div class="text-sm font-medium text-gray-700 mb-3">Playwright → XCUITest</div>
+                <div class="grid grid-cols-2 gap-2 text-sm font-mono">
+                    <div class="text-gray-500">page.locator('.btn')</div>
+                    <div class="text-gray-900">app.buttons["Save"]</div>
+                    <div class="text-gray-500">await click()</div>
+                    <div class="text-gray-900">.tap() / .click()</div>
+                    <div class="text-gray-500">await fill("text")</div>
+                    <div class="text-gray-900">.typeText("text")</div>
+                    <div class="text-gray-500">expect(el).toBeVisible()</div>
+                    <div class="text-gray-900">XCTAssert(el.exists)</div>
+                    <div class="text-gray-500">data-testid="login"</div>
+                    <div class="text-gray-900">.accessibilityIdentifier("login")</div>
+                </div>
+            </div>
+
+            <!-- Code example -->
+            <div class="code-block mb-6">
+                <code><span class="keyword">import</span> <span class="type">XCTest</span>
+
+<span class="keyword">class</span> <span class="type">LoginUITests</span>: <span class="type">XCTestCase</span> {
+    <span class="keyword">func</span> <span class="function">testLoginFlow</span>() {
+        <span class="keyword">let</span> app = <span class="type">XCUIApplication</span>()
+        app.<span class="function">launch</span>()
+
+        <span class="comment">// Find by accessibility identifier (like data-testid)</span>
+        app.textFields[<span class="string">"email-input"</span>].<span class="function">tap</span>()
+        app.textFields[<span class="string">"email-input"</span>].<span class="function">typeText</span>(<span class="string">"test@example.com"</span>)
+
+        app.secureTextFields[<span class="string">"password-input"</span>].<span class="function">typeText</span>(<span class="string">"secret"</span>)
+        app.buttons[<span class="string">"Login"</span>].<span class="function">tap</span>()
+
+        <span class="comment">// Assert with timeout for async</span>
+        <span class="type">XCTAssert</span>(app.staticTexts[<span class="string">"Welcome"</span>].<span class="function">waitForExistence</span>(timeout: <span class="number">5</span>))
+    }
+}</code>
+            </div>
+
+            <!-- Setting identifiers -->
+            <div class="text-sm font-medium text-gray-700 mb-2">Setting test identifiers in SwiftUI:</div>
+            <div class="code-block mb-6">
+                <code><span class="type">TextField</span>(<span class="string">"Email"</span>, text: <span class="property">$email</span>)
+    .<span class="function">accessibilityIdentifier</span>(<span class="string">"email-input"</span>)
+
+<span class="type">Button</span>(<span class="string">"Login"</span>) { <span class="comment">/* ... */</span> }
+    .<span class="function">accessibilityIdentifier</span>(<span class="string">"login-button"</span>)</code>
+            </div>
+
+            <!-- Key differences -->
+            <div class="diagram-box p-4">
+                <div class="text-sm font-medium text-gray-700 mb-3">Key Differences from Web Testing</div>
+                <div class="space-y-2 text-sm text-gray-600">
+                    <div class="flex items-start">
+                        <span class="text-accent mr-2">•</span>
+                        <span><strong>No CSS selectors</strong> — Query by accessibility tree, not DOM</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-accent mr-2">•</span>
+                        <span><strong>Auto-waits built in</strong> — Use waitForExistence() for async states</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-accent mr-2">•</span>
+                        <span><strong>Runs in Xcode</strong> — Tests live with your code, run via Cmd+U</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-accent mr-2">•</span>
+                        <span><strong>Simulator or device</strong> — Tests run in actual app environment</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 38 - Where to Go Next -->
+        <section class="section" id="s38">
+            <div class="text-sm text-gray-400 font-mono mb-2">38</div>
+            <h2 class="text-xl font-semibold text-accent mb-3">Where to Go Next</h2>
+            <p class="text-gray-600 mb-6">
+                Ready to build? Here's your path forward.
+            </p>
+
+            <div class="space-y-4">
+                <a href="https://developer.apple.com/xcode/" target="_blank" class="block diagram-box p-4 hover:bg-gray-100 transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mr-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-medium">Xcode + SwiftUI Previews</div>
+                            <div class="text-sm text-gray-500">The IDE with live preview as you code</div>
+                        </div>
+                        <div class="ml-auto text-gray-400">&rarr;</div>
+                    </div>
+                </a>
+
+                <a href="https://developer.apple.com/tutorials/swiftui" target="_blank" class="block diagram-box p-4 hover:bg-gray-100 transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600 mr-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-medium">Apple's SwiftUI Tutorials</div>
+                            <div class="text-sm text-gray-500">Official interactive tutorials</div>
+                        </div>
+                        <div class="ml-auto text-gray-400">&rarr;</div>
+                    </div>
+                </a>
+
+                <a href="https://www.hackingwithswift.com/100/swiftui" target="_blank" class="block diagram-box p-4 hover:bg-gray-100 transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 mr-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-medium">100 Days of SwiftUI</div>
+                            <div class="text-sm text-gray-500">Free course by Hacking with Swift</div>
+                        </div>
+                        <div class="ml-auto text-gray-400">&rarr;</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-16 pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
+            <p>Mac Frontend Guide &mdash; For web developers learning native Mac development</p>
+        </footer>
+    </div>
+</body>
+</html>
